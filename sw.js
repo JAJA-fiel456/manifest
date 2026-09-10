@@ -13,3 +13,9 @@ self.addEventListener("fetch", event => {
     console.log("Método:");
     console.log(event.request.method);
 });
+
+self.addEventListener("fetch", (event) => {
+    if (event.request.url.endsWith("/teste-sw")){
+        return;
+    }
+});
