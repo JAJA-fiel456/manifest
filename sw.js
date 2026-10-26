@@ -1,21 +1,43 @@
+const CACHE_NAME = "agenda-v2";
+const SHELL = [
+    "./",
+    "./index.html",
+    "./offline.html",
+    "./style.css",
+    "./app.js",
+    "./manifest.webmanifest",
+    "./icons/icon-192.png",
+    "./icons/icon-512.png"
+];
+
 self.addEventListener("install", event => {
-    console.log("Service Worker instalado");
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(SHELL))
+            .then(() => self.skipWaiting())
+    );
 });
 
 self.addEventListener("activate", event => {
-    console.log("Service Worker ativado");
+    event.waitUntil(
+        caches.keys().then(nomes => {
+            return Promise.all(
+                nomes
+                    .filter(nome => nome !== CACHE_NAME)
+                    .map(nome => caches.delete(nome))
+            );
+        }).then(() => self.clients.claim())
+    );
 });
 
 self.addEventListener("fetch", event => {
-    console.log("URL:");
-    console.log(event.request.url);
-
-    console.log("Método:");
-    console.log(event.request.method);
-});
-
-self.addEventListener("fetch", (event) => {
-    if (event.request.url.endsWith("/teste-sw")){
-        return;
-    }
+    event.respondWith(
+        caches.match(event.request)
+            .then(resposta => resposta || fetch(event.request))
+            .catch(() => {
+                if (event.request.mode === "navigate") {
+                    return caches.match("./offline.html");
+                }
+            })
+    );
 });

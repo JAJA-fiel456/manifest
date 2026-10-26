@@ -61,3 +61,20 @@ button {
   font-size: 16px;
   cursor: pointer;
 }
+
+/* indicador de conexão */
+#status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+#status.online {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+#status.offline {
+  background: #ffebee;
+  color: #c62828;
+}
